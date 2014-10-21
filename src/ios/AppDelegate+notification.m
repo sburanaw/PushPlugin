@@ -16,6 +16,11 @@ static char launchNotificationKey;
 
 @implementation AppDelegate (notification)
 
+- (id) getCommandInstance:(NSString*)className
+{
+    return [self.viewController getCommandInstance:className];
+}
+
 // its dangerous to override a method from within a category.
 // Instead we will use method swizzling. we set this up in the load call.
 + (void)load
