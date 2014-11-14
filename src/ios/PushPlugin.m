@@ -243,7 +243,7 @@
             [self parseDictionary:thisObject intoJSON:jsonString];
         else {
             NSString * value = [inDictionary objectForKey:key];
-            value = [value stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]
+            value = [value stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
             [jsonString appendFormat:@"%@:\"%@\",", key, value];
         }
     }
