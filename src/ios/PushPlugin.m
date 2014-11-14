@@ -219,7 +219,10 @@
 
         [self successWithMessage:[NSString stringWithFormat:@"%@", jsonStr]];
         
-        NSString * jsCallBack = [NSString stringWithFormat:@"%@(%@);", self.callback, jsonStr];
+        NSString * jsCallBack1 = [NSString stringWithFormat:@"alert('%@');", jsonStr];
+        [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack1];
+
+        NSString * jsCallBack = [NSString stringWithFormat:@"setTimeout(function(){%@(%@)}, 0);", self.callback, jsonStr];
         [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
         
         self.notificationMessage = nil;
@@ -238,8 +241,11 @@
     
         if ([thisObject isKindOfClass:[NSDictionary class]])
             [self parseDictionary:thisObject intoJSON:jsonString];
-        else
-            [jsonString appendFormat:@"%@:\"%@\",", key, [inDictionary objectForKey:key]];
+        else {
+            NSString * value = [inDictionary objectForKey:key];
+            value = [value stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]
+            [jsonString appendFormat:@"%@:\"%@\",", key, value];
+        }
     }
 }
 
