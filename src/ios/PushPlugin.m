@@ -219,9 +219,6 @@
 
         [self successWithMessage:[NSString stringWithFormat:@"%@", jsonStr]];
         
-        NSString * jsCallBack1 = [NSString stringWithFormat:@"alert('%@');", jsonStr];
-        [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack1];
-
         NSString * jsCallBack = [NSString stringWithFormat:@"setTimeout(function(){%@(%@)}, 0);", self.callback, jsonStr];
         [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
         
