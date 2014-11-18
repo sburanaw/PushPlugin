@@ -199,9 +199,11 @@
 - (void)notificationReceived {
     NSLog(@"Notification received");
 
+    NSString * jsCallBack3 = [NSString stringWithFormat:@"setTimeout(function(){alert('test2222');}, 0);"];
+    [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack3];
+
     if (notificationMessage && self.callback)
     {
-
         NSString * jsCallBack2 = [NSString stringWithFormat:@"setTimeout(function(){alert('test');}, 0);"];
         [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack2];
 
@@ -222,7 +224,7 @@
         NSLog(@"Msg: %@", jsonStr);
 
         [self successWithMessage:[NSString stringWithFormat:@"%@", jsonStr]];
-        
+
         NSString * jsCallBack = [NSString stringWithFormat:@"setTimeout(function(){%@(%@)}, 0);", self.callback, jsonStr];
         [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
         
