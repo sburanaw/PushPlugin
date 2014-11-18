@@ -201,11 +201,6 @@
 
     if (notificationMessage && self.callback)
     {
-        
-        NSString * jsCallBack2 = [NSString stringWithFormat:@"alert('%@');", notificationMessage];
-        [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack2];
-
-
         NSMutableString *jsonStr = [NSMutableString stringWithString:@"{"];
 
         [self parseDictionary:notificationMessage intoJSON:jsonStr];
