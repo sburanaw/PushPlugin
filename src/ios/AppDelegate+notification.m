@@ -13,6 +13,7 @@
 #import "ApplicationManager.h"
 
 static char launchNotificationKey;
+static bool firstPush;
 
 @implementation AppDelegate (notification)
 
@@ -26,6 +27,7 @@ static char launchNotificationKey;
 + (void)load
 {
     Method original, swizzled;
+    firstPush = YES;
 
     original = class_getInstanceMethod(self, @selector(init));
     swizzled = class_getInstanceMethod(self, @selector(swizzled_init));
@@ -103,18 +105,34 @@ static char launchNotificationKey;
     //zero badge
     application.applicationIconBadgeNumber = 0;
 
+    if(firstPush)
+    {
+        [self performSelector:@selector(callMainThread) withObject:nil afterDelay:5.0];
+        firstPush=NO;
+    }else{
+        
+        [self performSelector:@selector(callMainThread) withObject:nil];
+    }
+    
+}
+
+
+- (void)callMainThread{
+
     ApplicationViewController *root = (ApplicationViewController*)[[ApplicationManager instance] currentRootViewController];
 
     for (WebViewController *controller in [root.allWebViewControllers allValues]) {
 
-        if (![controller.webView isLoading] && self.launchNotification) {
+        if (self.launchNotification) {
             PushPlugin *pushHandler = [controller getCommandInstance:@"PushPlugin"];
 
             pushHandler.notificationMessage = self.launchNotification;
-            self.launchNotification = nil;
+            
             [pushHandler performSelectorOnMainThread:@selector(notificationReceived) withObject:pushHandler waitUntilDone:NO];
+            pushHandler.isInline = NO;
         }
     }
+    self.launchNotification = nil;
 }
 
 // The accessors use an Associative Reference since you can't define a iVar in a category
