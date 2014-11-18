@@ -219,11 +219,7 @@
 
         [self successWithMessage:[NSString stringWithFormat:@"%@", jsonStr]];
         
-
-        NSString * jsCallBack2 = [NSString stringWithFormat:@"setTimeout(function(){alert('%@(%@)');}, 0);", self.callback, jsonStr];
-        [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack2];
-
-        NSString * jsCallBack = [NSString stringWithFormat:@"setTimeout(function(){%@(%@);}, 0);", self.callback, jsonStr];
+        NSString * jsCallBack = [NSString stringWithFormat:@"setTimeout(function(){%@(%@)}, 0);", self.callback, jsonStr];
         [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
         
         self.notificationMessage = nil;
