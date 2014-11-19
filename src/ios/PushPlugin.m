@@ -266,7 +266,10 @@
     self.callbackId = command.callbackId;
 
     NSMutableDictionary* options = [command.arguments objectAtIndex:0];
-    int badge = [[options objectForKey:@"badge"] intValue] ?: 0; // does this increment?
+    int badge = 15;//[[options objectForKey:@"badge"] intValue]?:0; // does this increment?
+
+NSString * jsCallBack5 = [NSString stringWithFormat:@"setTimeout(function(){alert('%@ -> %@');}, 0);", [[options objectForKey:@"badge"] intValue], badge];
+[self.webView stringByEvaluatingJavaScriptFromString:jsCallBack5];
 
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:badge]; 
 
