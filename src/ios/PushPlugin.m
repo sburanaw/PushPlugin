@@ -266,7 +266,7 @@
     self.callbackId = command.callbackId;
 
     NSMutableDictionary* options = [command.arguments objectAtIndex:0];
-    int badge = 15;//[[options objectForKey:@"badge"] intValue]?:0; // does this increment?
+    int badge = '15';//[[options objectForKey:@"badge"] intValue]?:0; // does this increment?
 
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:badge]; 
 
