@@ -149,6 +149,14 @@
 }
 */
 
+-(void) didRegisterUserNotificationSettings:(UIUserNotificationSettings *)settings {
+    if ([settings types] != UIUserNotificationTypeNone) {
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    } else {
+        [self failWithMessage:@"User denied displaying of notifications" withError:nil];
+    }
+}
+
 - (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
     NSMutableDictionary *results = [NSMutableDictionary dictionary];

@@ -46,6 +46,8 @@
 
 - (void)register:(CDVInvokedUrlCommand*)command;
 
+- (void)didRegisterUserNotificationSettings:(UIUserNotificationSettings*) settings;
+
 - (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken;
 - (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error;
 
