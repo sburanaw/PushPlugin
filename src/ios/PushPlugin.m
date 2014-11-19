@@ -43,95 +43,102 @@
     [self successWithMessage:@"unregistered"];
 }
 
-- (void)register:(CDVInvokedUrlCommand*)command;
-{
-	self.callbackId = command.callbackId;
+- (void)register:(CDVInvokedUrlCommand*)command {
+    self.callbackId = command.callbackId;
 
     NSMutableDictionary* options = [command.arguments objectAtIndex:0];
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-    UIUserNotificationType UserNotificationTypes = UIUserNotificationTypeNone;
-#endif
-    UIRemoteNotificationType notificationTypes = UIRemoteNotificationTypeNone;
-    
     id badgeArg = [options objectForKey:@"badge"];
     id soundArg = [options objectForKey:@"sound"];
     id alertArg = [options objectForKey:@"alert"];
-    
+
+    BOOL badgeEnabled = NO;
+    BOOL soundEnabled = NO;
+    BOOL alertEnabled = NO;
+
     if ([badgeArg isKindOfClass:[NSString class]])
     {
-        if ([badgeArg isEqualToString:@"true"]) {
-            notificationTypes |= UIRemoteNotificationTypeBadge;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-            UserNotificationTypes |= UIUserNotificationTypeBadge;
-#endif
-        }
+        if ([badgeArg isEqualToString:@"true"])
+            badgeEnabled = YES;
     }
-    else if ([badgeArg boolValue]) {
-        notificationTypes |= UIRemoteNotificationTypeBadge;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        UserNotificationTypes |= UIUserNotificationTypeBadge;
-#endif
-    }
-    
+    else if ([badgeArg boolValue])
+        badgeEnabled = YES;
+
     if ([soundArg isKindOfClass:[NSString class]])
     {
-        if ([soundArg isEqualToString:@"true"]) {
-            notificationTypes |= UIRemoteNotificationTypeSound;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-            UserNotificationTypes |= UIUserNotificationTypeSound;
-#endif
-        }
+        if ([soundArg isEqualToString:@"true"])
+            soundEnabled = YES;
     }
-    else if ([soundArg boolValue]) {
-        notificationTypes |= UIRemoteNotificationTypeSound;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        UserNotificationTypes |= UIUserNotificationTypeSound;
-#endif
-    }
-    
+    else if ([soundArg boolValue])
+        soundEnabled = YES;
+
     if ([alertArg isKindOfClass:[NSString class]])
     {
-        if ([alertArg isEqualToString:@"true"]) {
-            notificationTypes |= UIRemoteNotificationTypeAlert;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-            UserNotificationTypes |= UIUserNotificationTypeAlert;
-#endif
-        }
+        if ([alertArg isEqualToString:@"true"])
+            alertEnabled = YES;
     }
-    else if ([alertArg boolValue]) {
-        notificationTypes |= UIRemoteNotificationTypeAlert;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        UserNotificationTypes |= UIUserNotificationTypeAlert;
-#endif
-    }
-    
-    notificationTypes |= UIRemoteNotificationTypeNewsstandContentAvailability;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-    UserNotificationTypes |= UIUserNotificationActivationModeBackground;
-#endif
-    
+    else if ([alertArg boolValue])
+        alertEnabled = YES;
+
     self.callback = [options objectForKey:@"ecb"];
-    
-    if (notificationTypes == UIRemoteNotificationTypeNone)
-        NSLog(@"PushPlugin.register: Push notification type is set to none");
-    
+
+
     isInline = NO;
-    
+
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-    if ([[UIApplication sharedApplication]respondsToSelector:@selector(registerUserNotificationSettings:)]) {
-        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UserNotificationTypes categories:nil];
-        [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+        // iOS8 in iOS8 SDK
+        [self enableiOS8NotificationsWithBadgeEnabled:badgeEnabled SoundEnabled:soundEnabled AlertEnabled:alertEnabled];
     } else {
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+        // iOS7 in iOS8 SDK
+        [self enableiOS7NotificationsWithBadgeEnabled:badgeEnabled SoundEnabled:soundEnabled AlertEnabled:alertEnabled];
     }
 #else
-    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+    // iOS7 in iOS7 SDK
+    [self enableiOS7NotificationsWithBadgeEnabled:badgeEnabled SoundEnabled:soundEnabled AlertEnabled:alertEnabled];
 #endif
-	
-	if (notificationMessage)			// if there is a pending startup notification
-		[self notificationReceived];	// go ahead and process it
+
+    if (notificationMessage)            // if there is a pending startup notification
+        [self notificationReceived];    // go ahead and process it
+}
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+- (void) enableiOS8NotificationsWithBadgeEnabled:(BOOL) badgeEnabled SoundEnabled:(BOOL) soundEnabled AlertEnabled:(BOOL) alertEnabled {
+    UIUserNotificationType notificationTypes = UIUserNotificationTypeNone;
+
+    if (badgeEnabled)
+        notificationTypes |= UIUserNotificationTypeBadge;
+
+    if (soundEnabled)
+        notificationTypes |= UIUserNotificationTypeSound;
+
+    if (alertEnabled)
+        notificationTypes |= UIUserNotificationTypeAlert;
+
+    if (notificationTypes == UIUserNotificationTypeNone)
+        NSLog(@"PushPlugin.register: Push notification type is set to none");
+
+    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:notificationTypes categories:nil];
+
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+}
+#endif
+
+- (void) enableiOS7NotificationsWithBadgeEnabled:(BOOL) badgeEnabled SoundEnabled:(BOOL) soundEnabled AlertEnabled:(BOOL) alertEnabled {
+    UIRemoteNotificationType notificationTypes = UIRemoteNotificationTypeNone;
+    if (badgeEnabled)
+        notificationTypes |= UIRemoteNotificationTypeBadge;
+
+    if (soundEnabled)
+        notificationTypes |= UIRemoteNotificationTypeSound;
+
+    if (alertEnabled)
+        notificationTypes |= UIRemoteNotificationTypeAlert;
+
+    if (notificationTypes == UIRemoteNotificationTypeNone)
+        NSLog(@"PushPlugin.register: Push notification type is set to none");
+
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
 }
 
 /*
