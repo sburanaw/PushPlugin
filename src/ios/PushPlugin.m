@@ -251,12 +251,19 @@
     {
         id thisObject = [inDictionary objectForKey:key];
     
-        if ([thisObject isKindOfClass:[NSDictionary class]])
+        if ([thisObject isKindOfClass:[NSDictionary class]]) {
             [self parseDictionary:thisObject intoJSON:jsonString];
-        else {
-            NSString * value = [inDictionary objectForKey:key];
+        }
+        else if ([thisObject isKindOfClass:[NSNumber class]]) {
+            [jsonString appendFormat:@"%@:\"%d\",", key, thisObject];
+        }
+        else if ([thisObject isKindOfClass:[NSString class]]) {
+            NSString * value = thisObject;
             value = [value stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
             [jsonString appendFormat:@"%@:\"%@\",", key, value];
+        }
+        else {
+
         }
     }
 }
